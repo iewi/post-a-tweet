@@ -5,4 +5,4 @@ You'll need both Gson and OAuth Signpost to run it. You'll also need to create t
 
 There are 3 separate programs here: GrabTweets, which grabs a bunch of tweets and writes them to a file; GenerateTweet, which parses the data in the file to make a Markov chain (which it writes to a file so it doesn't necessarily have to parse it again) and generates a tweet using the Markov chain; and PostStatus, which uses GenerateTweet to generate a tweet and then posts it to Twitter.
 
-I'm working on phasing out the Tweet class, and also putting in an authentication thing in PostStatus so anyone can post a status. It might take a while, though.
+~~I'm working on phasing out the Tweet class~~ (finished that, woohoo),and also putting in an authentication thing in PostStatus so anyone can post a status. It might take a while, though.
