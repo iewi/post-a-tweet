@@ -10,9 +10,9 @@ import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 
 public class GenerateTweet {
-	Map<String, ArrayList<String>> words;
-	Random gen;
-	String status;
+	protected Map<String, ArrayList<String>> words;
+	protected Random gen;
+	protected String status;
 	
 	public GenerateTweet() {
 		// this method generates a tweet based on the tweets written in the markovChains.json file
@@ -68,31 +68,26 @@ public class GenerateTweet {
 		// associates the words with the words which follow
 
 		Scanner scan = new Scanner(new File("markovChains.json"));
-		String[] tmp = new String[(GrabTweets.COUNT/5)+1];
+		String[][] raw_data = new String[(GrabTweets.COUNT/5)+1][1];
+		Gson gson = new Gson();
 		int current = 0;
 		
 		// populating tmp with data from the file
-		while (scan.hasNextLine() && current < tmp.length) {
+		// strip of punctuation, change all cases to lowercase except I
+		while (scan.hasNextLine() && current < raw_data.length) {
 			try {
-				tmp[current] = Tweet.grabTextFromData(scan.nextLine());
-				current++;
+				String[] array = gson.fromJson(scan.nextLine(), String[].class);
+				for (String in : array) {
+					raw_data[current] = in.split(" ");
+					formatTweet(raw_data[current]);
+					current++;
+				}
 			} catch (NullPointerException e) {break;} // it's probably hit the end of the file
 		}
 		scan.close();
 		
-		while(current < tmp.length) {tmp[current] = ""; current++;} // finish up populating tmp
-		
-		// separating tweets into words
-		String[][] raw_data = new String[tmp.length][1];
-		for (int i=0; i<tmp.length;i++) {
-			raw_data[i] = tmp[i].split(" ");
-		}
-		
-		// strip of punctuation, change all cases to lowercase except I
-		// should make separate method for this, because of words like I'm, I'd, there's, etc
-		for (int i=0; i < raw_data.length; i++) {
-			formatTweet(raw_data[i]);
-		}
+		// finish up populating raw_data
+		while(current < raw_data.length) {raw_data[current][0] = ""; current++;} 
 		
 		associate(raw_data);
 	}
@@ -110,8 +105,9 @@ public class GenerateTweet {
 				
 				// if initial doesn't already contain the word, add the empty string
 				// and associate it with the next non-trivial word
-				initial.add(array[c]);
-				//assert words != null;
+				if (!array[c].equals(""))
+					initial.add(array[c]);
+				
 				words.put("", initial);
 			}
 			catch (IndexOutOfBoundsException e) {} // if there are no valid words in this tweet, then don't do anything.
@@ -174,7 +170,11 @@ public class GenerateTweet {
 		okay.add("I've"); okay.add("you've"); okay.add("we've");
 		okay.add("they've"); okay.add("I"); okay.add("what's");
 		okay.add("where's"); okay.add("who's"); okay.add("what're");
-		okay.add("where're"); okay.add("haven't");
+		okay.add("where're"); okay.add("haven't"); okay.add("I'll");
+		okay.add("you'll"); okay.add("he'll"); okay.add("she'll");
+		okay.add("it'll"); okay.add("it'd"); okay.add("it's");
+		okay.add("we'll"); okay.add("they'll"); okay.add("that's");
+		okay.add("that'll"); okay.add("that'd");
 		
 		return okay;
 	}
@@ -224,6 +224,14 @@ public class GenerateTweet {
 		if (gson.fromJson(json, mapType) != null)
 			words = gson.fromJson(json, mapType);
 		
+	}
+	
+	public Map<String, ArrayList<String>> getMap() {
+		return words;
+	}
+	
+	public String getStatus() {
+		return status;
 	}
 	
 	public static void main(String[] args) {
