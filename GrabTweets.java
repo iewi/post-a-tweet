@@ -12,8 +12,10 @@ import java.io.*;
 import java.net.*;
 import java.util.Scanner;
 
+import javax.net.ssl.SSLException;
+
 public class GrabTweets {
-	public static final int COUNT = 250;
+	public static final int COUNT = 1000;
 	protected Gson gson;
 	protected File target;
 	
@@ -29,15 +31,16 @@ public class GrabTweets {
 			PrintWriter out = new PrintWriter(target);
 			try {
 				System.out.println("Setting up");
-				DefaultOAuthConsumer consumer = new DefaultOAuthConsumer("",""); // get your own API keys
-				consumer.setTokenWithSecret("","");
+				DefaultOAuthConsumer consumer = new DefaultOAuthConsumer(Keys.consumerKey, Keys.consumerSecret);
+				
+				consumer.setTokenWithSecret(Keys.accessKey, Keys.accessSecret);
 				
 				System.out.println("Connecting");
 				HttpParameters encodedParams = new HttpParameters();
 				
 				// by default, it follows a bunch of celebrities
 				String followUsers = "25365536,23617610,17919972,24929621,14230524,27195114,"+
-									 "157140968,166739404,23669909,27260086,44409004,15485441,"+
+									 "157140968,166739404,23669909,44409004,15485441,"+
 									 "34507480,23083404,184910040,169686021,32959253,115485051,"+
 									 "25521487,101928415";
 				String params = "language=en&follow="+OAuth.percentEncode(followUsers);
@@ -79,19 +82,24 @@ public class GrabTweets {
 		String temp = "", fin = "";
 		int count=0;
 		BufferedReader read = new BufferedReader(new InputStreamReader(cnx.getInputStream()));
-		while (temp != null && count<COUNT) {
-			temp = read.readLine();
-			temp = temp.split(",\"source\"")[0] + "}";
-			if (count % 5 == 0)
-				fin += temp + "]\n[";
-			else
-				fin += temp + ",";
-			
-			count++;
-			if (count % 30 == 0)
-				System.out.println(count + " ");
-			else
-				System.out.print(count + " ");
+		try {
+			while (temp != null && count<COUNT) {
+				temp = read.readLine();
+				temp = temp.split(",\"source\"")[0];
+				temp = temp.split(",\"text\":")[1];				
+				if (count % 10 == 0)
+					fin += temp + "]\n[";
+				else
+					fin += temp + ",";
+				
+				count++;
+				if (count % 30 == 0)
+					System.out.println(count + " ");
+				else
+					System.out.print(count + " ");
+			}
+		} catch (SSLException e) {
+			System.err.println("\n" + e.getMessage());
 		}
 		fin = "[" + fin.substring(0, fin.length()-1)
 				       .replace("},}", "}").replace("},}", "}")+ "]";
