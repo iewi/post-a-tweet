@@ -13,9 +13,11 @@ import oauth.signpost.http.HttpParameters;
 public class PostStatus {
 	protected static URL goHere;
 	protected static OAuthConsumer consumer;
+	
 	public static void main(String[] args) throws IOException {
-		consumer = new DefaultOAuthConsumer("",""); // get your own keys
-		consumer.setTokenWithSecret("","");
+		consumer = new DefaultOAuthConsumer(Keys.consumerKey, Keys.consumerSecret);
+		
+		consumer.setTokenWithSecret(Keys.accessKey, Keys.accessSecret);
 		
 		GenerateTweet tweet = new GenerateTweet();
 		
