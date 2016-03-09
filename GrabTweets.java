@@ -1,4 +1,5 @@
 // Dorothy Carter	Jan. 2016
+// grabs celebrity tweets from Twitter's streaming api and writes them to markovChains.json
 
 package twitter;
 
