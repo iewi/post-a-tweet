@@ -1,4 +1,5 @@
 // Dorothy Carter	Jan. 2016
+// this generates a tweet from markovChains.java using a markov chain
 
 package twitter;
 
