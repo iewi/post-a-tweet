@@ -1,4 +1,5 @@
 // Dorothy Carter	Jan. 2016
+// this program posts a generated tweet to Twitter
 
 package twitter;
 
